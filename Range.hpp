@@ -1,39 +1,54 @@
-#ifndef RANGE_HPP
-#define RANGE_HPP
-
 #include <iterator>
 
-class RangeIterator : public std::iterator<std::input_iterator_tag, long> {
-  long _num;
-  long _step;
-  long _end;
-
-public:
-  RangeIterator(long num, long step, long end);
-
-  RangeIterator &operator++();
-
-  RangeIterator operator++(int);
-
-  bool operator==(const RangeIterator &other) const;
-
-  bool operator!=(const RangeIterator &other) const;
-
-  long operator*() const;
-};
-
 class Range {
-  long _start;
-  long _end;
-  long _step;
+  int _start = 0;
+  int _end;
+  int _step = 1;
 
 public:
-  Range(long start, long end, long step);
-  Range(long start, long end);
-  explicit Range(long end);
+  explicit Range(int end) : _end(end) {}
+  Range(int start, int end) : _start(start), _end(end) {
+    if (start > end) {
+      _step = -1;
+      _end--;
+    }
+  }
+  Range(int start, int end, int step) : _start(start), _end(end), _step(step) {}
 
-  RangeIterator begin();
-  RangeIterator end();
+  class Iterator {
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = int;
+
+    int _num;
+    int _step;
+
+  public:
+    Iterator(int num, int step) : _num(num), _step(step) {}
+
+    Iterator &operator++() {
+      _num += _step;
+      return *this;
+    }
+
+    Iterator operator++(int) { return {_num += _step, _step}; }
+
+    Iterator &operator--() {
+      --_num;
+      return *this;
+    }
+
+    Iterator operator--(int) { return {_num -= _step, _step}; }
+
+    bool operator==(const Iterator &other) const { return other._num == this->_num; }
+
+    bool operator!=(const Iterator &other) const { return !(other == *this); }
+
+    value_type operator*() const { return _num; }
+  };
+
+  Iterator begin() { return {_start, _step}; };
+  Iterator end() {
+    int last = _end + (_end - _start) % _step;
+    return {last, _step};
+  };
 };
-
-#endif // !RANGE_HPP
