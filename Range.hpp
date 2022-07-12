@@ -1,3 +1,6 @@
+#ifndef RANGE_HPP
+#define RANGE_HPP
+
 #include <iterator>
 
 class Range {
@@ -52,3 +55,4 @@ public:
     return {last, _step};
   };
 };
+#endif // !RANGE_HPP
